@@ -1,35 +1,39 @@
-# Make sure this file is executable: chmod +x run_all.sh
+set -euo pipefail
 
-# Define your models and tasks
 MODELS=(
-  "google/byt5-small",
-  "google/mt5-small",
-  "stanfordnlp/mrt5-small",
+  #"google/mt5-small"
+  #"stanfordnlp/mrt5-small"
+  "google/byt5-small"
   "meta-llama/Llama-3.2-3B"
 )
 TASKS=(
-  "global_mmlu",
-  "paws-x",
-  "truthfulqa-multi",
-  "xcopa",
-  "xnli",
-  "xquad",
-  "xwinograd",
-  "lambada_multilingual",
-  "execute",
-  "flores_plus"
+  "belebele"
+  "global_mmlu"
+  "lambada_multilingual_stablelm"
+  "mgsm"
+  "mlqa"
+  "mmlu_prox"
+  "okapi"
+  #"paws-x"
+  "truthfulqa-multi"
+  "xcopa"
+  "xnli"
+  "xquad"
+  "xstorycloze"
+  "xwinograd"
 )
 
-# Loop over models and tasks
-for MODEL in "${MODELS[@]}"; do
-  for TASK in "${TASKS[@]}"; do
-    echo "Running $MODEL on $TASK..."
+for TASK in "${TASKS[@]}"; do
+  for MODEL in "${MODELS[@]}"; do
+    echo "Running $MODEL on $TASK"
     lm_eval \
-      --model "hf" \
-      --model_args pretrained="$MODEL"
+      --model hf \
+      --model_args pretrained=$MODEL,trust_remote_code=True \
       --device cuda \
       --batch_size auto:4 \
       --tasks "$TASK" \
-      --outfile "results_${MODEL//\//_}_${TASK}.json"
+      --output_path "results/${MODEL//\//_}/${TASK}" \
+      --log_samples \
+      --limit 2
   done
 done

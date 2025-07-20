@@ -4,8 +4,8 @@ ERROR_LOG="all_errors.log"
 : > "$ERROR_LOG"
 
 MODELS=(
-  "google/mt5-small"
   "stanfordnlp/mrt5-small"
+  "google/mt5-small"
   "google/byt5-small"
   "meta-llama/Llama-3.2-3B"
 )
@@ -163,7 +163,9 @@ XWINOGRAD=(
   "xwinograd"
 )
 
-#!/usr/bin/env bash
+ALL_TASKS=("${GLOBAL_MMLU[@]}" "${LAMBADA[@]}" "${MGSM[@]}" "${MLQA[@]}" "${MMLU_PRO_X[@]}" "${OKAPI[@]}" "${PAWS_X[@]}" "${TRUTHFULQA[@]}" "${XCOPA[@]}" "${XNLI[@]}" "${XQUAD[@]}" "${XWINOGRAD[@]}" )
+
+
 set -uo pipefail
 # Don't exit on error so we can log and continue
 # Initialize the error log
@@ -175,13 +177,17 @@ slugify() {
   echo "$1" | sed 's/[^a-zA-Z0-9]/_/g'
 }
 
-for TASK in "${XNLI[@]}"; do
+for TASK in "${ALL_TASKS[@]}"; do
   SAFE_TASK=$(slugify "$TASK")
   for MODEL in "${MODELS[@]}"; do
     SAFE_MODEL=$(slugify "$MODEL")
     echo "▶ Running ${MODEL} on ${TASK}…"
 
-    MODEL_ARGS="pretrained=${MODEL},trust_remote_code=True"
+    if [[ "$MODEL" == "stanfordnlp/mrt5-small" ]]; then
+      MODEL_ARGS="pretrained=${MODEL},trust_remote_code=True,backend=seq2seq"
+    else
+      MODEL_ARGS="pretrained=${MODEL},trust_remote_code=True"
+    fi
 
     OUT_DIR="logs/${SAFE_MODEL}"
     mkdir -p ${OUT_DIR}
@@ -192,8 +198,8 @@ for TASK in "${XNLI[@]}"; do
       --model hf \
       --model_args "$MODEL_ARGS" \
       --device cuda \
-      --batch_size auto:4 \
-      --num_fewshot 8
+      --batch_size auto:1:8 \
+      --num_fewshot 5 \
       --tasks "$TASK" \
       --output_path "results/${TASK}" \
       --log_samples \

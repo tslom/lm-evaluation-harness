@@ -1,6 +1,2 @@
 -e .
-torch>=2.6.0+cu118
-torchvision>=0.17.0+cu118
-tiktoken
 protobuf
-blobfile

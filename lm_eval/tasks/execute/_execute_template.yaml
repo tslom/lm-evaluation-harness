@@ -1,0 +1,23 @@
+custom_dataset: !import_dataset
+dataset_kwargs:
+  data_files:
+    validation: "../EXECUTE/data/tasks/{lang}/{task}.tsv"
+
+training_split: null
+validation_split: validation
+test_split: null
+
+fewshot_config:
+  sampler: first_n
+
+output_type: generate_until
+doc_to_text:
+doc_to_target:
+metric_list:
+  - metric: acc
+  - metric: exact_math
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 0.0

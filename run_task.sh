@@ -1,4 +1,4 @@
-set +e
+set -euo pipefail
 
 ERROR_LOG="all_errors.log"
 : > "$ERROR_LOG"
@@ -137,10 +137,6 @@ PAWS_X=(
   "pawsx"
 )
 
-TRUTHFULQA=(
-  "truthfulqa-multi"
-)
-
 XCOPA=(
   "xcopa"
 )
@@ -159,8 +155,6 @@ XQUAD=(
 XWINOGRAD=(
   "xwinograd"
 )
-
-set -uo pipefail
 
 MODEL=""
 BENCHMARK_GROUPS=""
@@ -263,8 +257,9 @@ if lm_eval \
      2>&1 | tee "$LOG_FILE"
 then
   echo "[OK] ${MODEL}"
+  exit 0
 else
+  rc=$?   # exit code from lm_eval
   echo "[ERROR] ${MODEL} (see ${LOG_FILE})" | tee -a "$ERROR_LOG"
+  exit $rc
 fi
-
-echo "✅ All done. Any failures have been logged to ${ERROR_LOG}"

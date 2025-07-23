@@ -10,13 +10,12 @@ BENCHMARKS=(
 #  "GLOBAL_MMLU"
 #  "MLQA"
 #  "MMLU_PRO_X"
+  "PAWSX"
 #  "OKAPI"
-#  "PAWS_X"
-#  "TRUTHFULQA"
   "XCOPA"
   "XNLI"
   "XQUAD"
-#  "XWINOGRAD"
+  "XWINOGRAD"
 )
 
 STATUS_MD="run_status.md"
@@ -44,20 +43,18 @@ for MODEL in "${MODELS[@]}"; do
     fi
 
     echo "▶ Running $MODEL × $BM…" | tee -a "$LOGFILE"
-    start=$(date +%s)
 
-    # Call your existing driver
-    if ./run_task.sh --model "$MODEL" --benchmark "$BM" 2>&1 | tee -a "$LOGFILE"; then
-      end=$(date +%s)
-      echo "- [x] **$MODEL** on **$BM** — ✅ $(date +'%Y-%m-%d %H:%M:%S') (took $((end-start))s)" >> "$STATUS_MD"
+    ./run_task.sh --model "$MODEL" --benchmark "$BM" 2>&1 | tee -a "$LOGFILE"
+    EXIT_CODE=${PIPESTATUS[0]}
+
+    if [ $EXIT_CODE -eq 0 ]; then
+      echo "- [x] **$MODEL** on **$BM** — ✅ $(date +'%Y-%m-%d %H:%M:%S')" >> "$STATUS_MD"
       touch "$MARKER"
     else
-      end=$(date +%s)
-      echo "- [ ] **$MODEL** on **$BM** — ❌ $(date +'%Y-%m-%d %H:%M:%S') (took $((end-start))s)" >> "$STATUS_MD"
+      echo "- [ ] **$MODEL** on **$BM** — ❌ $(date +'%Y-%m-%d %H:%M:%S')" >> "$STATUS_MD"
+      echo "[ERROR] $MODEL × $BM failed (exit $EXIT_CODE)" | tee -a "$ERROR_LOG"
     fi
-
-    echo "" >> "$STATUS_MD"
   done
 done
 
-echo "✅ All combinations processed. See $STATUS_MD and $LOG_DIR for details."```
+echo "✅ All combinations processed. See $STATUS_MD and $LOG_DIR for details."

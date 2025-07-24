@@ -3,12 +3,6 @@ set -euo pipefail
 ERROR_LOG="all_errors.log"
 : > "$ERROR_LOG"
 
-MODELS=(
-  "stanfordnlp/mrt5-small"
-  "google/mt5-small"
-  "google/byt5-small"
-  "meta-llama/Llama-3.2-3B"
-)
 BELEBELE=(
   "belebele"
 )
@@ -233,7 +227,7 @@ slugify() {
 SAFE_MODEL=$(slugify "$MODEL")
 echo "▶ Running ${MODEL}"
 
-if [[ "$MODEL" == "stanfordnlp/mrt5-small" ]]; then
+if [[ "$MODEL" == "stanfordnlp/mrt5-large" ]]; then
   MODEL_ARGS="pretrained=${MODEL},trust_remote_code=True,backend=seq2seq"
 else
   MODEL_ARGS="pretrained=${MODEL},trust_remote_code=True"
@@ -250,6 +244,7 @@ if lm_eval \
      --model_args "$MODEL_ARGS" \
      --device cuda \
      --batch_size 96 \
+     --cache_requests true \
      --num_fewshot 0 \
      --tasks "$TASKS_CSV" \
      --output_path "results_2" \

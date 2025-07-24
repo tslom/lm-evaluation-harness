@@ -1,13 +1,13 @@
 MODELS=(
-  "stanfordnlp/mrt5-small"
-  "google/mt5-small"
-  "google/byt5-small"
-  "meta-llama/Llama-3.2-3B"
+  "stanfordnlp/mrt5-large"
+  "google/mt5-large"
+  "google/byt5-large"
+  "meta-llama/Llama-3.2-1B"
 )
 
 BENCHMARKS=(
 #  "BELEBELE"
-#  "GLOBAL_MMLU"
+  "GLOBAL_MMLU"
 #  "MLQA"
 #  "MMLU_PRO_X"
   "PAWSX"
